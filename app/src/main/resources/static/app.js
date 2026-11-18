@@ -138,9 +138,9 @@ function triageErrorMessage(error) {
 function renderStats() {
   const s = state.stats;
   countTo("kpiOpen", s.open);
-  $("kpiTotal").textContent = `${plural(s.total, "incident")} in this session`;
+  $("kpiTotal").textContent = `${plural(s.total, "incident")} this shift`;
   $("kpiTriage").textContent = number(s.total) ? duration(s.avgTriageMillis) : "—";
-  $("kpiContain").textContent = number(s.avgTimeToContainMillis) ? `Avg time to contain · ${duration(s.avgTimeToContainMillis)}` : "Alert received → grounded response";
+  $("kpiContain").textContent = number(s.avgTimeToContainMillis) ? `Avg time to contain · ${duration(s.avgTimeToContainMillis)}` : "Alert received to grounded response";
   const verified = number(s.verifiedSteps);
   $("kpiVerified").textContent = verified ? "100%" : "—";
   $("kpiDropped").textContent = verified || number(s.droppedSteps)
@@ -244,7 +244,9 @@ function filteredIncidents() {
 function renderSeverityBar(all) {
   const counts = { critical: 0, high: 0, medium: 0, low: 0 };
   for (const incident of all) if (incident.status !== "CONTAINED" && severityName(incident) in counts) counts[severityName(incident)]++;
-  $("sevBar").innerHTML = Object.entries(counts).filter(([, n]) => n).map(([name, n]) => `<span class="${name}" style="flex-grow:${n}" title="${n} ${name}"></span>`).join("");
+  const present = Object.entries(counts).filter(([, n]) => n);
+  $("sevBar").innerHTML = present.map(([name, n]) => `<span class="${name}" style="flex-grow:${n}" title="${n} ${name}"></span>`).join("");
+  $("sevLegend").innerHTML = present.map(([name, n]) => `<li class="${name}"><strong>${n}</strong> ${name}</li>`).join("") || "<li>Nothing open</li>";
 }
 function renderList() {
   const all = orderedIncidents();
@@ -254,6 +256,10 @@ function renderList() {
   $("listCount").textContent = all.length;
   renderSeverityBar(all);
   let entering = 0;
+  if (!state.loaded && !all.length && !query) {
+    $("incidentList").innerHTML = Array.from({ length: 4 }, () => '<div class="skeleton-row" aria-hidden="true"><span class="bone w45"></span><span class="bone w95"></span><span class="bone w60"></span></div>').join("") + '<span class="sr-only">Loading incidents…</span>';
+    return;
+  }
   $("incidentList").innerHTML = filtered.length ? filtered.map((i) => {
     const isNew = !state.seen.has(i.id);
     const motion = isNew ? ` enter${state.loaded ? " fresh" : ""}" style="animation-delay:${Math.min(entering++, 10) * 35}ms` : "";
@@ -263,7 +269,7 @@ function renderList() {
     <div class="incident-meta">${e(i.source)} <span aria-hidden="true">·</span> ${e(i.triage ? label(i.triage.classification) : "Awaiting triage")}</div>
     <div class="incident-bottom"><span class="incident-tags">${severity(i.triage?.severity || i.rawAlert?.severity)}${statusPill(i.status)}</span><span class="incident-time">${i.triage ? e(duration(i.triage.millis)) : ""}</span></div></button>`;
   }).join("") :
-    `<div class="empty-state"><span class="empty-icon" aria-hidden="true">${icon(query ? "search" : "inbox")}</span><h2>${query ? "No matching incidents" : "All quiet. Stay ready."}</h2><p>${query ? "Try a different incident ID, source, or rule." : "Incoming alerts appear here. Submit an alert or start a simulation."}</p></div>`;
+    `<div class="empty-state"><span class="empty-glyph" aria-hidden="true">${query ? "?" : "—"}</span><h2>${query ? `Nothing matches “${e(query)}”` : "Quiet shift so far"}</h2><p>${query ? "Search covers incident ID, rule, source and classification." : "New alerts land here as they arrive. Submit one, or stream the demo alerts with Simulate attack."}</p></div>`;
   for (const incident of all) state.seen.add(incident.id);
 }
 function renderFeed() { renderList(); renderDetail(); }
@@ -308,7 +314,7 @@ function renderDetail() {
   const i = state.incidents.get(state.selected);
   if (!i) {
     root.dataset.rendered = "";
-    root.innerHTML = `<div class="empty-state"><span class="empty-icon" aria-hidden="true">${icon("shield")}</span><h2>Your incident workspace</h2><p>Select an incident to inspect the evidence, review cited guidance, and approve the response.</p><div class="empty-actions"><button class="button primary" data-action="simulate">${icon("zap")}Simulate attack</button><button class="button secondary" data-action="open-submit">${icon("plus")}Submit your first alert</button></div></div>`;
+    root.innerHTML = `<div class="empty-state"><span class="empty-glyph" aria-hidden="true">§</span><h2>Open an incident to see its case file</h2><p>The case file is where the decision gets made. For each incident it shows:</p><ol class="empty-steps"><li>Classification, severity and the playbook the alert was matched to</li><li>Containment steps, each quoting its playbook section word for word</li><li>Suggestions the citation check blocked, and why</li><li>Your approve or reject decision, recorded under your name</li></ol><div class="empty-actions"><button class="button primary" data-action="simulate">${icon("zap")}Simulate attack</button><button class="button secondary" data-action="open-submit">${icon("plus")}Paste an alert</button></div></div>`;
     return;
   }
   const t = i.triage;
@@ -327,7 +333,7 @@ function renderDetail() {
     <div class="meta-row"><span>${icon("server")}${e(i.source)}</span><span>${icon("clock")}${e(time(i.receivedAt))} UTC</span>${t ? `<span>${icon("zap")}Triaged in ${e(duration(t.millis))}</span>` : ""}${severityShift}</div></div>
     <div class="heading-actions"><button class="button secondary small" data-action="ticket">${icon("file")}Generate ticket</button>${timer}</div></div>`;
   if (i.status === "TRIAGING") {
-    root.innerHTML = heading + `<div class="detail-content stagger">${pipelineHtml(i, null)}<div class="triaging-message"><span class="spinner" aria-hidden="true"></span> Analyzing the signal and checking approved guidance…</div><div class="skeleton" aria-hidden="true"><span></span><span></span><span></span></div>${rawAlertHtml(i)}</div>`;
+    root.innerHTML = heading + `<div class="detail-content stagger">${pipelineHtml(i, null)}<div class="triaging-message"><span class="spinner" aria-hidden="true"></span> Analyzing the signal and checking approved guidance…</div><div class="skeleton" aria-hidden="true"><span class="bone w95"></span><span class="bone w80"></span><span class="bone w60"></span><span class="bone block"></span></div>${rawAlertHtml(i)}</div>`;
     return;
   }
   if (!t) {
@@ -396,8 +402,8 @@ function stepHtml(incident, step) {
   const status = String(step.status || "PENDING").toLowerCase();
   const decision = canDecide
     ? `<div class="step-actions"><button class="button reject" data-action="reject" data-index="${e(step.index)}" ${state.decisions.has(key) ? "disabled" : ""}>Reject</button><button class="button approve" data-action="approve" data-index="${e(step.index)}" ${state.decisions.has(key) ? "disabled" : ""}>${icon("check")}Approve</button></div>`
-    : `<span class="decision ${e(status)}">${status === "approved" ? icon("check") : status === "rejected" ? icon("x") : icon("clock")}<strong>${e(human(step.status).toLowerCase().replace(/^./, (c) => c.toUpperCase()))}</strong>${step.decidedBy ? ` by ${e(step.decidedBy)}` : ""}${step.decidedAt ? ` · ${e(time(step.decidedAt))}` : ""}</span>`;
-  return `<article class="step-card ${e(status)}"><div class="step-heading"><span class="step-number">${status === "approved" ? icon("check") : e(number(step.index) + 1)}</span><div class="step-main"><div class="step-title">${e(step.action)}</div>${step.highImpact ? `<div class="step-tags"><span class="approval-label">${icon("lock")}Approval required</span></div>` : ""}</div></div>
+    : `<span class="decision ${e(status)}">${status === "approved" ? icon("check") : status === "rejected" ? icon("x") : icon("clock")}<strong>${e(human(step.status).toLowerCase().replace(/^./, (c) => c.toUpperCase()))}</strong><span class="who">${step.decidedBy ? ` by ${e(step.decidedBy)}` : ""}${step.decidedAt ? ` · ${e(time(step.decidedAt))} UTC` : ""}</span></span>`;
+  return `<article class="step-card ${e(status)}"><div class="step-heading"><span class="step-number" aria-label="Step ${e(number(step.index) + 1)}">${status === "approved" ? icon("check") : e(String(number(step.index) + 1).padStart(2, "0"))}</span><div class="step-main"><div class="step-title">${e(step.action)}</div>${step.highImpact ? `<div class="step-tags"><span class="approval-label">${icon("lock")}Approval required</span></div>` : ""}</div></div>
     <blockquote class="sop-quote"><div class="quote-head"><span class="sop-ref"><span class="mono">${e(step.sectionId)}</span> · ${e(step.sectionTitle)}</span><span class="verified-tag">${icon("shieldCheck")}Quote verified</span></div>“${e(step.quote)}”</blockquote><div class="step-foot">${decision}</div></article>`;
 }
 function auditHtml(entries) {
@@ -430,27 +436,31 @@ function showView(view) {
   $("breadcrumb").textContent = { feed: "Live feed", evaluations: "Evaluations", playbooks: "Playbooks" }[view] || view;
   if (view === "playbooks" && !state.playbooksLoaded) loadPlaybooks();
 }
-function loadingHtml(message) { return `<div class="empty-state"><span class="empty-icon" aria-hidden="true"><span class="spinner"></span></span><p>${e(message)}</p></div>`; }
+function loadingHtml(message) {
+  const bones = '<span class="bone w30"></span><span class="bone w80"></span><span class="bone w60"></span><span class="bone tall"></span>';
+  return `<div class="loading" aria-busy="true"><p class="triaging-message" style="margin-top:20px"><span class="spinner" aria-hidden="true"></span>${e(message)}</p><div class="skeleton" aria-hidden="true">${bones}${bones}</div></div>`;
+}
 function errorHtml(error, action) {
   const disconnected = error.status === 503 || error.status === 404;
-  return `<div class="card view-error"><span class="empty-icon" aria-hidden="true">${icon(disconnected ? "plug" : "alert")}</span><h2>${disconnected ? "Triage service not connected yet" : "Unable to load this view"}</h2><p>${e(disconnected ? "Start the Python triage service and switch the app to the http engine, then try again." : error.message)}</p><button class="button secondary" data-action="${e(action)}">Try again</button></div>`;
+  return `<div class="card view-error"><span class="empty-glyph" aria-hidden="true">!</span><h2>${disconnected ? "Triage service not connected yet" : "Unable to load this view"}</h2><p>${e(disconnected ? "Start the Python triage service, run the app with the http engine, then try again." : error.message)}</p><button class="button secondary" data-action="${e(action)}">Try again</button></div>`;
 }
 async function loadPlaybooks() {
   $("reloadPlaybooks").disabled = true;
   $("playbookContent").innerHTML = loadingHtml("Loading approved playbooks…");
+  $("playbookContent").setAttribute("aria-busy", "true");
   try {
     const books = await api("/api/playbooks");
     $("playbookContent").innerHTML = books.map((b) => {
       const sections = b.sections || [];
       const approvals = sections.filter((s) => s.requiresApproval).length;
-      return `<article class="card playbook-card"><div class="playbook-meta"><div class="pb-id"><span class="badge accent mono">${e(b.id)}</span><span class="badge plain">${e(label(b.classification))}</span></div><h2>${e(b.name)}</h2><div class="pb-stats"><span><strong>${e(sections.length)}</strong> approved sections</span><span><strong>${e(approvals)}</strong> need approval</span></div><div class="keyword-list">${(b.keywords || []).map((k) => `<span>${e(k)}</span>`).join("")}</div></div>
+      return `<article class="playbook-card"><div class="playbook-meta"><div class="pb-number">${e(b.id)}</div><h2>${e(b.name)}</h2><div class="pb-id"><span class="badge plain">${e(label(b.classification))}</span></div><div class="pb-stats"><span><strong>${e(sections.length)}</strong> approved sections</span><span><strong>${e(approvals)}</strong> need approval</span></div><div class="keyword-list">${(b.keywords || []).map((k) => `<span>${e(k)}</span>`).join("")}</div></div>
         <div class="playbook-sections">${sections.map((s) => `<details class="playbook-section${s.requiresApproval ? " approval-section" : ""}"><summary><span class="mono">${e(s.id)}</span><span class="title">${e(s.title)}</span>${s.requiresApproval ? `<span class="approval-label">${icon("lock")}needs approval</span>` : ""}${icon("chevron").replace("<svg", '<svg class="chev"')}</summary><p>${e(s.text)}</p></details>`).join("")}</div></article>`;
-    }).join("") || `<div class="card empty-state"><span class="empty-icon" aria-hidden="true">${icon("book")}</span><p>No approved playbooks are available.</p></div>`;
+    }).join("") || `<div class="empty-state"><span class="empty-glyph" aria-hidden="true">§</span><h2>No playbooks loaded</h2><p>The triage service returned an empty playbook index. Check data/playbooks/index.txt.</p></div>`;
     state.playbooksLoaded = true;
   } catch (error) { $("playbookContent").innerHTML = errorHtml(error, "playbooks"); }
-  finally { $("reloadPlaybooks").disabled = false; }
+  finally { $("reloadPlaybooks").disabled = false; $("playbookContent").setAttribute("aria-busy", "false"); }
 }
-/** Renders a metric as a progress ring when it is a percentage or a fraction, otherwise as an icon tile. */
+/** Renders a metric as a bar when it is a percentage or fraction; other metrics get a hatched track. */
 function metricVisual(key, value) {
   const text = String(value ?? "");
   let percent = null;
@@ -458,10 +468,9 @@ function metricVisual(key, value) {
   if (pct) percent = Number(pct[1]);
   const fraction = /^(\d+)\s*\/\s*(\d+)$/.exec(text);
   if (fraction && Number(fraction[2]) > 0) percent = (Number(fraction[1]) / Number(fraction[2])) * 100;
-  if (percent == null || !Number.isFinite(percent)) return `<span class="metric-icon">${icon(key === "avgTriageMillis" ? "clock" : "shieldX")}</span>`;
-  const circumference = 125.66;
+  if (percent == null || !Number.isFinite(percent)) return '<div class="metric-bar none" aria-hidden="true"></div>';
   const tone = percent >= 90 ? "good" : percent >= 60 ? "mid" : "low";
-  return `<svg class="ring" viewBox="0 0 48 48" aria-hidden="true"><circle class="track" cx="24" cy="24" r="20"/><circle class="value ${tone}" cx="24" cy="24" r="20" style="--circ:${circumference};stroke-dasharray:${circumference};stroke-dashoffset:${(circumference * (1 - Math.min(100, Math.max(0, percent)) / 100)).toFixed(2)}"/></svg>`;
+  return `<div class="metric-bar" aria-hidden="true"><span class="${tone}" style="width:${Math.min(100, Math.max(0, percent)).toFixed(1)}%"></span></div>`;
 }
 /** Splits "70% (7/10)" into a headline value and a quieter count. */
 function metricValue(key, value) {
@@ -482,8 +491,8 @@ async function runEvaluation() {
     const labels = { classificationAccuracy: "Classification accuracy", injectionDetectionAccuracy: "Injection detection accuracy", escalationAccuracy: "Escalation accuracy", injectionRecall: "Injection recall", injectionFalsePositives: "Injection false positives", retrievalRecallAt1: "Retrieval recall @ 1", retrievalRecallAt3: "Retrieval recall @ 3", modelStepsPassingVerification: "Steps passing verification", avgTriageMillis: "Average triage time" };
     const perfect = cases.filter((c) => c.classificationCorrect && c.injectionCorrect && c.escalationCorrect && c.playbook === c.expectedPlaybook).length;
     const mark = (ok, text) => `<span class="check ${ok ? "good" : "bad"}">${ok ? "✓" : "✕"} ${text}</span>`;
-    $("evaluationContent").innerHTML = `<div class="eval-head"><div><h2>${e(s.cases)} evaluation cases</h2><p class="small">${e(perfect)} of ${e(cases.length)} cases fully correct across every check</p></div><span class="badge accent mono">${e(s.mode)}</span></div>
-      <div class="eval-metrics">${Object.entries(labels).map(([key, label], n) => `<div class="eval-metric" style="animation-delay:${n * 40}ms">${metricVisual(key, s[key])}<div><span>${e(label)}</span><strong>${metricValue(key, s[key])}</strong></div></div>`).join("")}</div>
+    $("evaluationContent").innerHTML = `<div class="eval-head"><div class="eval-score">${e(perfect)}<small>/${e(cases.length)}</small></div><div><h2>Cases correct on every check</h2><p>${e(s.cases)} labeled cases. A case counts only if classification, playbook, injection flag and escalation all match.</p></div><span class="badge accent">${e(s.mode)}</span></div>
+      <div class="eval-metrics">${Object.entries(labels).map(([key, label], n) => `<div class="eval-metric" style="animation-delay:${n * 40}ms"><span>${e(label)}</span><strong>${metricValue(key, s[key])}</strong>${metricVisual(key, s[key])}</div>`).join("")}</div>
       <div class="table-wrap"><table><thead><tr><th>Case / expected</th><th>Classification</th><th>Playbook</th><th>Injection</th><th>Escalation</th><th>Steps</th><th>Time</th></tr></thead><tbody>${cases.map((c) => `<tr><td><span class="mono">${e(c.file)}</span><span class="sub">${e(label(c.expectedClassification))} · ${e(c.expectedPlaybook)}</span>${c.error ? `<p class="bad">${e(triageErrorMessage(c.error))}</p>` : ""}</td>
         <td>${mark(c.classificationCorrect, e(label(c.classification)))}</td>
         <td class="mono">${mark(c.playbook === c.expectedPlaybook, e(c.playbook))}<span class="sub">Expected: ${e(c.expectedPlaybook)}</span></td>
@@ -693,12 +702,12 @@ $("incidentList").addEventListener("click", (event) => {
   const row = event.target.closest("[data-incident]");
   if (row) selectIncident(row.dataset.incident);
 });
-function selectIncident(id) {
+function selectIncident(id, reveal = false) {
   if (!id || id === state.selected) return;
   state.selected = id;
   state.tab = "response";
   renderFeed();
-  document.querySelector(`[data-incident="${CSS.escape(id)}"]`)?.scrollIntoView?.({ block: "nearest", behavior: "smooth" });
+  if (reveal) document.querySelector(`[data-incident="${CSS.escape(id)}"]`)?.scrollIntoView?.({ block: "nearest", behavior: "smooth" });
 }
 async function copyIoc(button) {
   try {
@@ -718,7 +727,7 @@ document.addEventListener("keydown", (event) => {
   event.preventDefault();
   const step = event.key === "ArrowDown" || event.key === "j" ? 1 : -1;
   const index = ids.indexOf(state.selected);
-  selectIncident(ids[Math.max(0, Math.min(ids.length - 1, index < 0 ? 0 : index + step))]);
+  selectIncident(ids[Math.max(0, Math.min(ids.length - 1, index < 0 ? 0 : index + step))], true);
 });
 window.addEventListener("scroll", () => document.querySelector(".topbar")?.classList.toggle("scrolled", window.scrollY > 4), { passive: true });
 document.addEventListener("click", (event) => {
@@ -800,5 +809,5 @@ renderStats();
 clock();
 setInterval(clock, 1000);
 refreshStatus().catch((error) => toast(error.message, true));
-refreshIncidents().catch((error) => toast(error.message, true));
+refreshIncidents().catch((error) => { state.loaded = true; renderList(); toast(error.message, true); });
 connect();

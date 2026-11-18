@@ -129,7 +129,7 @@ class ApiControllerTest {
         mvc.perform(get("/")).andExpect(status().isOk()).andExpect(forwardedUrl("index.html"));
         mvc.perform(get("/index.html")).andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("app.js")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Instrument+Serif")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Plus+Jakarta+Sans")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("JetBrains+Mono")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"refreshStatus\"")));
         mvc.perform(get("/app.css")).andExpect(status().isOk())

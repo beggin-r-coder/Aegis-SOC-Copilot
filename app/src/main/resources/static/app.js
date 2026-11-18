@@ -681,7 +681,9 @@ function connect() {
 
 document.querySelector("nav").addEventListener("click", (event) => {
   const button = event.target.closest("[data-view]");
-  if (button) showView(button.dataset.view);
+  if (!button) return;
+  showView(button.dataset.view);
+  if (navState.drawer) setDrawer(false);
 });
 $("incidentSearch").addEventListener("input", renderList);
 $("incidentSort").addEventListener("click", (event) => {
@@ -799,6 +801,34 @@ renderAvatar();
 $("analyst").addEventListener("input", () => {
   renderAvatar();
   try { localStorage.setItem("aegis.analyst", $("analyst").value); } catch { /* Approvals still work without storage. */ }
+});
+/** Sidebar: a collapsible rail on desktop (remembered) and a slide-out drawer on smaller screens. */
+const navState = { collapsed: false, drawer: false };
+const drawerQuery = typeof matchMedia === "function" ? matchMedia("(max-width: 1024px)") : null;
+function setCollapsed(collapsed) {
+  navState.collapsed = collapsed;
+  document.body.classList.toggle("nav-collapsed", collapsed);
+  $("navToggle").setAttribute("aria-expanded", String(!collapsed));
+  $("navToggle").setAttribute("aria-label", collapsed ? "Expand sidebar" : "Collapse sidebar");
+  try { localStorage.setItem("aegis.navCollapsed", collapsed ? "1" : "0"); } catch { /* Preference is optional. */ }
+}
+function setDrawer(open, moveFocus = true) {
+  navState.drawer = open;
+  document.body.classList.toggle("nav-open", open);
+  $("navScrim").hidden = !open;
+  $("menuButton").setAttribute("aria-expanded", String(open));
+  if (moveFocus) (open ? $("navClose") : $("menuButton")).focus();
+}
+try { setCollapsed(localStorage.getItem("aegis.navCollapsed") === "1"); } catch { setCollapsed(false); }
+$("navToggle").addEventListener("click", () => setCollapsed(!navState.collapsed));
+$("menuButton").addEventListener("click", () => setDrawer(true));
+$("navClose").addEventListener("click", () => setDrawer(false));
+$("navScrim").addEventListener("click", () => setDrawer(false));
+drawerQuery?.addEventListener?.("change", (event) => { if (!event.matches && navState.drawer) setDrawer(false, false); });
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && navState.drawer) { setDrawer(false); return; }
+  const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(event.target?.tagName || "") || document.querySelector("dialog[open]");
+  if (event.key === "[" && !typing && !event.metaKey && !event.ctrlKey && !drawerQuery?.matches) setCollapsed(!navState.collapsed);
 });
 function clock() { $("utcClock").textContent = `${new Date().toLocaleDateString("en-GB", { timeZone: "UTC", day: "2-digit", month: "short" })} · ${time(new Date().toISOString())} UTC`; }
 renderFeed();

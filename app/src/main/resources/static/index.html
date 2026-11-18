@@ -15,24 +15,27 @@
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar" aria-label="Sidebar">
+    <div class="sidebar-head">
     <a class="brand" href="./" aria-label="Aegis home">
       <svg class="brand-mark" viewBox="0 0 40 44" fill="none" aria-hidden="true"><path d="M20 3 36 9v12c0 10-16 20-16 20S4 31 4 21V9L20 3Z" stroke="currentColor" stroke-width="2"/><path d="m12 26 8-14 8 14m-13-5h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span>AEGIS<small>SOC COPILOT</small></span>
     </a>
+    <button type="button" id="navClose" class="icon-button nav-close" aria-label="Close navigation"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
     <nav aria-label="Main navigation">
       <div class="nav-label">Operate</div>
-      <button class="nav-button active" data-view="feed" aria-current="page">
+      <button class="nav-button active" data-view="feed" data-tip="Live feed" aria-current="page">
         <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span>
         <span class="nav-text"><span class="nav-title">Live feed</span><span class="nav-desc">Triage and approve</span></span>
         <span class="nav-count" id="navCount">0</span>
       </button>
       <div class="nav-label">Reference</div>
-      <button class="nav-button" data-view="evaluations">
+      <button class="nav-button" data-view="evaluations" data-tip="Evaluations">
         <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 16v-4M12 16V8M17 16v-7"/></svg></span>
         <span class="nav-text"><span class="nav-title">Evaluations</span><span class="nav-desc">Score the labeled set</span></span>
       </button>
-      <button class="nav-button" data-view="playbooks">
+      <button class="nav-button" data-view="playbooks" data-tip="Playbooks">
         <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5v14z"/><path d="M20 17v4H6.5A2.5 2.5 0 0 1 4 18.5"/></svg></span>
         <span class="nav-text"><span class="nav-title">Playbooks</span><span class="nav-desc">Approved SOPs</span></span>
       </button>
@@ -53,12 +56,20 @@
           <span id="analystHint" class="sr-only">Recorded against every approval and rejection.</span>
         </div>
       </div>
+      <button type="button" id="navToggle" class="nav-toggle" aria-controls="sidebar" aria-expanded="true" data-tip="Expand sidebar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15.5 10l-2 2 2 2"/></svg>
+        <span class="nav-toggle-label">Collapse sidebar</span><kbd aria-hidden="true">[</kbd>
+      </button>
     </div>
   </aside>
+  <div class="scrim" id="navScrim" hidden></div>
 
   <main id="main" class="main" tabindex="-1">
     <header class="topbar">
+      <div class="topbar-left">
+      <button type="button" id="menuButton" class="icon-button menu-button" aria-controls="sidebar" aria-expanded="false" aria-label="Open navigation"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
       <nav class="crumbs" aria-label="Breadcrumb"><span>Aegis</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg><span>Security operations</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg><span id="breadcrumb" class="crumb-current" aria-current="page">Live feed</span></nav>
+      </div>
       <div class="topbar-right">
         <span class="clock mono" id="utcClock">UTC</span>
       </div>

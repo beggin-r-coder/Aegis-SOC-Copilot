@@ -331,6 +331,26 @@ async function run() {
     assert.ok(html.includes('&lt;script&gt;unsafe'));
     assert.ok(!html.includes('<script>'));
   });
+  await test('sidebar collapses to a rail and expands again from the toggle', async () => {
+    const f = await fixture();
+    assert.equal(f.run('navState.collapsed'), false);
+    f.element('navToggle').listeners.click();
+    assert.equal(f.run('navState.collapsed'), true);
+    f.element('navToggle').listeners.click();
+    assert.equal(f.run('navState.collapsed'), false);
+  });
+  await test('drawer opens from the menu button and closes from the close button and scrim', async () => {
+    const f = await fixture();
+    f.element('menuButton').listeners.click();
+    assert.equal(f.run('navState.drawer'), true);
+    assert.equal(f.element('navScrim').hidden, false);
+    f.element('navScrim').listeners.click();
+    assert.equal(f.run('navState.drawer'), false);
+    assert.equal(f.element('navScrim').hidden, true);
+    f.element('menuButton').listeners.click();
+    f.element('navClose').listeners.click();
+    assert.equal(f.run('navState.drawer'), false);
+  });
   console.log(`${passed} frontend tests passed.`);
   return passed;
 }

@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: app/pom.xml
+      - name: Test app
+        working-directory: app
+        # Override the developer-only repository path in app/.mvn/maven.config.
+        run: mvn -B -q test -Dmaven.repo.local="$HOME/.m2/repository"
+
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install -r triage-service/requirements.txt
+      - name: Test triage service
+        working-directory: triage-service
+        env:
+          AEGIS_DATA_DIR: ../data
+        run: pytest -q

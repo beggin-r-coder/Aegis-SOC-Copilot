@@ -1,0 +1,39 @@
+{
+  "alert_id": "ALERT-PHISH-001",
+  "source": "mail gateway",
+  "severity": "HIGH",
+  "rule": "Credential-harvesting email with confirmed user click",
+  "timestamp": "2026-11-18T09:05:00Z",
+  "description": "Mail gateway detected a spoofed account verification message delivered to three users; proxy logs confirm one recipient clicked the credential-harvesting link.",
+  "sender": "security@account-verify.example",
+  "reply_to": "helpdesk@account-verify.example",
+  "sender_ip": "203.0.113.21",
+  "recipients": [
+    "alice@example.com",
+    "bob@example.com",
+    "carol@example.com"
+  ],
+  "recipient_count": 3,
+  "subject": "Action required: verify your account",
+  "message_id": "<verify-001@account-verify.example>",
+  "urls": [
+    "https://account-verify.example/login"
+  ],
+  "authentication": {
+    "spf": "fail",
+    "dkim": "fail",
+    "dmarc": "fail"
+  },
+  "delivery_status": "delivered",
+  "proxy_events": [
+    {
+      "timestamp": "2026-11-18T09:03:40Z",
+      "user": "alice@example.com",
+      "source_ip": "192.0.2.31",
+      "url": "https://account-verify.example/login",
+      "http_status": 200,
+      "action": "allowed"
+    }
+  ],
+  "credential_submission_confirmed": false
+}

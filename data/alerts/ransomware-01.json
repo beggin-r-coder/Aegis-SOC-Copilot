@@ -1,0 +1,36 @@
+{
+  "alert_id": "ALERT-RANSOM-001",
+  "source": "EDR",
+  "severity": "CRITICAL",
+  "rule": "Shadow copy deletion followed by mass ransomware file renaming",
+  "timestamp": "2026-11-18T09:12:00Z",
+  "description": "EDR observed shadow copy deletion and 4812 files renamed to .locked in 90 seconds on FIN-WS-042 under svc-backup. An earlier VPN login through Citrix NetScaler Gateway from 203.0.113.47 had no MFA challenge; investigate possible Citrix Bleed session hijacking.",
+  "host": "FIN-WS-042",
+  "host_ip": "192.0.2.42",
+  "user": "svc-backup",
+  "process": {
+    "name": "vssadmin.exe",
+    "command_line": "vssadmin.exe delete shadows /all /quiet",
+    "parent_name": "powershell.exe",
+    "timestamp": "2026-11-18T09:10:20Z"
+  },
+  "file_activity": {
+    "operation": "rename",
+    "file_count": 4812,
+    "extension": ".locked",
+    "window_seconds": 90,
+    "window_start": "2026-11-18T09:10:30Z",
+    "window_end": "2026-11-18T09:12:00Z"
+  },
+  "vpn_login": {
+    "timestamp": "2026-11-18T08:47:00Z",
+    "product": "Citrix NetScaler Gateway",
+    "gateway": "vpn.example.com",
+    "gateway_ip": "198.51.100.10",
+    "source_ip": "203.0.113.47",
+    "user": "svc-backup",
+    "result": "success",
+    "mfa_performed": false
+  },
+  "edr_action": "alert_only"
+}

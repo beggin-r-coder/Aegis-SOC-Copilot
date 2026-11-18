@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+pydantic>=2
+openai>=1.40
+numpy
+faiss-cpu
+rank-bm25
+pytest
+httpx

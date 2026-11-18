@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#F7F5EF">
+  <title>Aegis · SOC Copilot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;450;500;600&amp;family=Syne:wght@500;600;650;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/app.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <aside class="sidebar">
+    <a class="brand" href="/" aria-label="Aegis home">
+      <svg class="brand-mark" viewBox="0 0 40 44" fill="none" aria-hidden="true"><path d="M20 3 36 9v12c0 10-16 20-16 20S4 31 4 21V9L20 3Z" stroke="currentColor" stroke-width="2"/><path d="m12 26 8-14 8 14m-13-5h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>AEGIS<small>SOC COPILOT</small></span>
+    </a>
+    <div class="workspace-label">WORKSPACE <span>SOC / 01</span></div>
+    <nav aria-label="Main navigation">
+      <button class="nav-button active" data-view="feed" aria-current="page"><span class="nav-index" aria-hidden="true">01</span>Live feed<span class="nav-count" id="navCount">0</span></button>
+      <button class="nav-button" data-view="evaluations"><span class="nav-index" aria-hidden="true">02</span>Evaluations</button>
+      <button class="nav-button" data-view="playbooks"><span class="nav-index" aria-hidden="true">03</span>Playbooks</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="engine-panel"><div class="eyebrow">TRIAGE ENGINE</div><div id="triageMode" class="engine-value">Connecting…</div><div class="eyebrow retrieval-label">RETRIEVAL</div><div id="retrievalMode" class="muted small">Checking service…</div></div>
+      <label class="analyst-label" for="analyst"><span class="avatar" aria-hidden="true">A</span><span>Analyst on shift<small>Used for approval records</small></span></label>
+      <input id="analyst" class="analyst-input" value="SOC Analyst" maxlength="100" autocomplete="name" aria-label="Analyst on shift name">
+      <div class="sidebar-foot"><span class="tiny-dot"></span> Human judgment. Verified guidance.</div>
+    </div>
+  </aside>
+  <main id="main" class="main" tabindex="-1">
+    <div class="topline"><span>SECURITY OPERATIONS / <span id="breadcrumb">LIVE FEED</span></span><span class="mono" id="utcClock">UTC</span></div>
+    <section id="view-feed" class="view">
+      <header class="page-header"><div><div class="page-kicker">REVIEW / DECIDE / RESPOND</div><div class="heading-line"><h1>Incident operations</h1><span id="connection" class="connection" role="status"><span class="live-dot"></span><span id="connectionText">Connecting</span></span></div><p>An operational record of signals, evidence, and analyst decisions.</p></div><div class="header-actions"><button id="clearButton" class="button ghost">Clear</button><button id="submitOpen" class="button primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Submit alert JSON</button><button id="simulateButton" class="button secondary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m13 2-9 12h7l-1 8 10-13h-8l1-7Z"/></svg> Simulate attack</button></div></header>
+      <div class="kpi-grid" aria-label="Incident statistics"><div class="ledger-caption"><span>OPERATIONAL SNAPSHOT</span><span>VERIFIED GUIDANCE / HUMAN DECISIONS</span></div>
+        <article class="kpi card"><div class="kpi-label">Open incidents </div><div id="kpiOpen" class="kpi-value">0</div><div id="kpiTotal" class="kpi-note">0 total incidents</div></article>
+        <article class="kpi card"><div class="kpi-label">Average triage time </div><div id="kpiTriage" class="kpi-value">—</div><div class="kpi-note">Alert received → grounded response</div></article>
+        <article class="kpi card"><div class="kpi-label">Verified SOP citations </div><div class="kpi-value cyan" id="kpiVerified">—</div><div id="kpiDropped" class="kpi-note">Steps shown with verified SOP citation · no steps yet</div></article>
+        <article class="kpi card"><div class="kpi-label">Tampering attempts caught </div><div id="kpiInjection" class="kpi-value">0</div><div id="kpiEscalated" class="kpi-note">0 incidents escalated to L2</div></article>
+      </div>
+      <div class="feed-grid">
+        <section class="card incident-panel" aria-labelledby="incidentsHeading"><div class="panel-heading"><h2 id="incidentsHeading">Incident register <span class="count-badge" id="listCount">0</span></h2><div id="incidentSort" class="sort-controls" role="group" aria-label="Sort incidents"><button class="sort-button active" data-sort="newest" aria-pressed="true">Newest</button><button class="sort-button" data-sort="severity" aria-pressed="false">Severity</button></div></div><div class="search-wrap"><span aria-hidden="true">⌕</span><input id="incidentSearch" type="search" placeholder="Search incidents…" aria-label="Search incidents"></div><div id="incidentList" class="incident-list"></div><div class="list-footer"><span class="tiny-dot"></span> Updates arrive automatically</div></section>
+        <section id="incidentDetail" class="card detail-panel" aria-label="Incident detail"></section>
+      </div>
+    </section>
+    <section id="view-evaluations" class="view" hidden><header class="page-header"><div><h1>Evaluations</h1><p>Measure triage quality against the labeled alert set.</p></div><button id="runEval" class="button primary">Run evaluation</button></header><div id="evaluationContent" class="card content-card"><div class="empty-state"><span class="empty-symbol" aria-hidden="true">02</span><h2>Measure the response</h2><p>Compare classifications, injection detection, retrieval, and verified steps across your evaluation set.</p></div></div></section>
+    <section id="view-playbooks" class="view" hidden><header class="page-header"><div><h1>Approved playbooks</h1><p>The source of truth behind every containment step.</p></div><button id="reloadPlaybooks" class="button secondary">Refresh playbooks</button></header><div id="playbookContent" class="playbook-grid"></div></section>
+    <footer class="main-footer"><span>AEGIS / SECURITY OPERATIONS</span><div class="footer-status"><span id="lastSync">Awaiting service status</span><button id="refreshStatus" type="button" class="footer-button">Refresh status ↗</button></div></footer>
+  </main>
+  <dialog id="alertDialog" aria-labelledby="alertDialogTitle"><form id="alertForm"><div class="dialog-heading"><div><div class="eyebrow">NEW INCIDENT</div><h2 id="alertDialogTitle">Submit alert JSON</h2></div><button type="button" id="submitClose" class="icon-button" aria-label="Close dialog">×</button></div><label for="sampleSelect">Start with a sample</label><div class="sample-controls"><select id="sampleSelect"><option value="">Choose a sample alert…</option></select><button type="button" id="loadSample" class="button secondary">Load</button></div><label for="alertJson">Alert payload</label><textarea id="alertJson" class="mono" rows="15" spellcheck="false" required placeholder='{"source": "edr", "rule": "Suspicious activity"}'></textarea><p id="submitError" class="form-error" role="alert" hidden></p><div class="dialog-footer"><span class="muted small">Your alert is treated as untrusted input.</span><button type="submit" id="submitButton" class="button primary">Submit for triage</button></div></form></dialog>
+  <dialog id="ticketDialog" aria-labelledby="ticketDialogTitle">
+    <div class="dialog-heading"><div><div class="eyebrow">INCIDENT REPORT</div><h2 id="ticketDialogTitle">Incident ticket</h2></div><button type="button" id="ticketClose" class="icon-button" aria-label="Close incident ticket">×</button></div>
+    <div class="report-toolbar"><div class="report-view-switch" role="group" aria-label="Ticket view"><button type="button" id="ticketPreviewButton" class="report-view-button active" aria-pressed="true">Report preview</button><button type="button" id="ticketSourceButton" class="report-view-button" aria-pressed="false">Markdown source</button></div><p id="ticketStatus" class="small muted" role="status" aria-live="polite"></p></div>
+    <div class="report-scroll"><article id="ticketPreview" class="ticket-report" aria-label="Incident report preview"></article><div id="ticketSource" hidden><label for="ticketMarkdown">Markdown source</label><textarea id="ticketMarkdown" class="mono" rows="20" readonly spellcheck="false"></textarea></div></div>
+    <div class="dialog-footer"><span class="muted small">Includes cited actions and the approval audit trail.</span><div class="ticket-actions"><button type="button" id="copyTicket" class="button secondary" disabled>Copy Markdown</button><button type="button" id="downloadTicket" class="button primary" disabled>Download .md</button></div></div>
+  </dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

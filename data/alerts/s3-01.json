@@ -1,0 +1,50 @@
+{
+  "alert_id": "ALERT-S3-001",
+  "source": "CloudTrail",
+  "severity": "HIGH",
+  "rule": "S3 bucket ACL changed to grant public READ access",
+  "timestamp": "2026-11-18T09:30:00Z",
+  "description": "CloudTrail recorded a successful PutBucketAcl granting the AllUsers group READ on acme-finance-exports, a bucket intended for private finance exports.",
+  "event_name": "PutBucketAcl",
+  "event_time": "2026-11-18T09:29:45Z",
+  "aws_region": "us-east-1",
+  "source_ip": "203.0.113.80",
+  "user_identity": {
+    "type": "IAMUser",
+    "user_name": "finance-export-deployer",
+    "account_id": "111122223333"
+  },
+  "bucket": "acme-finance-exports",
+  "bucket_arn": "arn:aws:s3:::acme-finance-exports",
+  "request_parameters": {
+    "bucket_name": "acme-finance-exports",
+    "access_control_policy": {
+      "grants": [
+        {
+          "grantee": {
+            "type": "Group",
+            "name": "AllUsers"
+          },
+          "permission": "READ"
+        }
+      ]
+    }
+  },
+  "public_access_block": {
+    "bucket": {
+      "BlockPublicAcls": false,
+      "IgnorePublicAcls": false,
+      "BlockPublicPolicy": false,
+      "RestrictPublicBuckets": false
+    },
+    "account": {
+      "BlockPublicAcls": false,
+      "IgnorePublicAcls": false,
+      "BlockPublicPolicy": false,
+      "RestrictPublicBuckets": false
+    }
+  },
+  "object_ownership": "BucketOwnerPreferred",
+  "intended_public_access": false,
+  "result": "success"
+}

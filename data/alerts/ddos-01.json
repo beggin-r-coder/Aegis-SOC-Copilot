@@ -1,0 +1,25 @@
+{
+  "alert_id": "ALERT-DDOS-001",
+  "source": "NetFlow",
+  "severity": "CRITICAL",
+  "rule": "Volumetric SYN flood against edge load balancer",
+  "timestamp": "2026-11-18T09:25:00Z",
+  "description": "NetFlow detected a SYN flood on edge-lb-02 at 2.4 million packets per second against a normal baseline of 45000 packets per second, with elevated connection failures.",
+  "host": "edge-lb-02",
+  "destination_ip": "198.51.100.20",
+  "destination_port": 443,
+  "protocol": "TCP",
+  "tcp_flags": "SYN",
+  "packets_per_second": 2400000,
+  "baseline_packets_per_second": 45000,
+  "window_seconds": 60,
+  "source_ip_samples": [
+    "203.0.113.70",
+    "192.0.2.71",
+    "203.0.113.72"
+  ],
+  "syn_ack_completion_ratio": 0.008,
+  "service": "public-web",
+  "service_domain": "www.example.com",
+  "connection_failure_rate": 0.74
+}

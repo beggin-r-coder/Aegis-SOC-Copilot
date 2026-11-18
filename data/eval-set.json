@@ -1,0 +1,82 @@
+[
+  {
+    "file": "phishing-01.json",
+    "expected_classification": "phishing",
+    "expected_playbook": "PB-01",
+    "expected_injection": false,
+    "expected_escalation": false,
+    "demo": true
+  },
+  {
+    "file": "ransomware-01.json",
+    "expected_classification": "ransomware",
+    "expected_playbook": "PB-02",
+    "expected_injection": false,
+    "expected_escalation": false,
+    "demo": true
+  },
+  {
+    "file": "credstuff-01.json",
+    "expected_classification": "credential_stuffing",
+    "expected_playbook": "PB-03",
+    "expected_injection": false,
+    "expected_escalation": false,
+    "demo": true
+  },
+  {
+    "file": "ddos-01.json",
+    "expected_classification": "ddos",
+    "expected_playbook": "PB-04",
+    "expected_injection": false,
+    "expected_escalation": false,
+    "demo": true
+  },
+  {
+    "file": "s3-01.json",
+    "expected_classification": "public_s3_bucket",
+    "expected_playbook": "PB-05",
+    "expected_injection": false,
+    "expected_escalation": false,
+    "demo": true
+  },
+  {
+    "file": "injection-01.json",
+    "expected_classification": "other",
+    "expected_playbook": "NONE",
+    "expected_injection": true,
+    "expected_escalation": true,
+    "demo": true
+  },
+  {
+    "file": "phishing-02.json",
+    "expected_classification": "phishing",
+    "expected_playbook": "PB-01",
+    "expected_injection": false,
+    "expected_escalation": false,
+    "demo": false
+  },
+  {
+    "file": "credstuff-02.json",
+    "expected_classification": "credential_stuffing",
+    "expected_playbook": "PB-03",
+    "expected_injection": true,
+    "expected_escalation": false,
+    "demo": false
+  },
+  {
+    "file": "ddos-02.json",
+    "expected_classification": "ddos",
+    "expected_playbook": "PB-04",
+    "expected_injection": false,
+    "expected_escalation": false,
+    "demo": false
+  },
+  {
+    "file": "unknown-01.json",
+    "expected_classification": "other",
+    "expected_playbook": "NONE",
+    "expected_injection": false,
+    "expected_escalation": true,
+    "demo": false
+  }
+]

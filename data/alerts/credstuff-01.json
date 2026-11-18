@@ -1,0 +1,36 @@
+{
+  "alert_id": "ALERT-CRED-001",
+  "source": "identity provider",
+  "severity": "HIGH",
+  "rule": "Distributed credential stuffing with successful logins without MFA",
+  "timestamp": "2026-11-18T09:20:00Z",
+  "description": "Identity provider recorded 1240 failed logins across 980 usernames within ten minutes, followed by two successful logins without MFA from the same source set.",
+  "application": "employee-portal",
+  "target_domain": "login.example.com",
+  "window_start": "2026-11-18T09:10:00Z",
+  "window_end": "2026-11-18T09:20:00Z",
+  "window_seconds": 600,
+  "failed_logins": 1240,
+  "targeted_usernames": 980,
+  "successful_logins": 2,
+  "source_ips": [
+    "203.0.113.60",
+    "198.51.100.61",
+    "203.0.113.62"
+  ],
+  "user_agent": "python-requests/2.31.0",
+  "successful_events": [
+    {
+      "timestamp": "2026-11-18T09:18:12Z",
+      "user": "dana@example.com",
+      "source_ip": "203.0.113.60",
+      "mfa_performed": false
+    },
+    {
+      "timestamp": "2026-11-18T09:19:03Z",
+      "user": "evan@example.com",
+      "source_ip": "198.51.100.61",
+      "mfa_performed": false
+    }
+  ]
+}

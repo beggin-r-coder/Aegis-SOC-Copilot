@@ -1,0 +1,30 @@
+{
+  "alert_id": "ALERT-UNKNOWN-001",
+  "source": "container runtime security",
+  "severity": "HIGH",
+  "rule": "Unexpected xmrig cryptominer in production Kubernetes pod",
+  "timestamp": "2026-11-18T09:55:00Z",
+  "description": "Runtime telemetry detected xmrig starting in a production Kubernetes pod, followed by sustained CPU saturation and an outbound mining pool connection. Initial access and the scope of container compromise are unknown.",
+  "cluster": "prod-payments",
+  "namespace": "payments",
+  "pod": "payments-api-7c9d8b6f5d-k2m4n",
+  "container": "api",
+  "node": "prod-worker-03",
+  "pod_ip": "192.0.2.150",
+  "node_ip": "192.0.2.151",
+  "process": {
+    "name": "xmrig",
+    "executable": "/tmp/xmrig",
+    "parent_name": "sh",
+    "command_line": "/tmp/xmrig --url pool-mining.example:3333 --user demo-worker --donate-level 0",
+    "uid": 1000
+  },
+  "network": {
+    "destination_domain": "pool-mining.example",
+    "destination_ip": "203.0.113.130",
+    "destination_port": 3333,
+    "protocol": "TCP"
+  },
+  "cpu_utilization_percent": 98,
+  "deployment_change_authorized": false
+}

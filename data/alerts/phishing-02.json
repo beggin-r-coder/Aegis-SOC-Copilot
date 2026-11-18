@@ -1,0 +1,31 @@
+{
+  "alert_id": "ALERT-PHISH-002",
+  "source": "mail gateway",
+  "severity": "HIGH",
+  "rule": "Phishing attachment using Internet Shortcut mark-of-the-web bypass",
+  "timestamp": "2026-11-18T09:40:00Z",
+  "description": "A phishing email delivered a .url Internet Shortcut attachment that a user opened; correlated endpoint telemetry reports a mark-of-the-web security warning bypass consistent with CVE-2024-21412.",
+  "sender": "billing@invoice-review.example",
+  "sender_ip": "203.0.113.101",
+  "recipients": [
+    "frank@example.com"
+  ],
+  "subject": "Updated invoice for review",
+  "message_id": "<invoice-002@invoice-review.example>",
+  "attachment": {
+    "filename": "Invoice-November.url",
+    "type": "internet shortcut",
+    "target_url": "https://invoice-review.example/statement.url"
+  },
+  "endpoint_event": {
+    "timestamp": "2026-11-18T09:39:30Z",
+    "host": "FIN-WS-056",
+    "host_ip": "192.0.2.56",
+    "user": "frank@example.com",
+    "file_opened": "Invoice-November.url",
+    "mark_of_the_web_bypass": true,
+    "security_warning_displayed": false,
+    "cve": "CVE-2024-21412"
+  },
+  "delivery_status": "delivered"
+}

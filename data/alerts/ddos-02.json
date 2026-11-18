@@ -1,0 +1,26 @@
+{
+  "alert_id": "ALERT-DDOS-002",
+  "source": "edge proxy",
+  "severity": "CRITICAL",
+  "rule": "HTTP/2 rapid reset flood on public API",
+  "timestamp": "2026-11-18T09:50:00Z",
+  "description": "The public API is receiving an HTTP/2 rapid reset flood with immediate RST_STREAM frames after stream creation, consistent with CVE-2023-44487. API latency and 503 responses are elevated.",
+  "host": "api-edge-02",
+  "destination_ip": "198.51.100.40",
+  "destination_port": 443,
+  "target_domain": "api.example.com",
+  "protocol": "HTTP/2",
+  "window_seconds": 60,
+  "streams_opened": 9600000,
+  "rst_stream_frames": 9500000,
+  "reset_ratio": 0.9896,
+  "requests_per_second": 160000,
+  "baseline_requests_per_second": 2500,
+  "source_ip_samples": [
+    "203.0.113.120",
+    "192.0.2.121",
+    "198.51.100.122"
+  ],
+  "http_503_rate": 0.63,
+  "p95_latency_ms": 8200
+}

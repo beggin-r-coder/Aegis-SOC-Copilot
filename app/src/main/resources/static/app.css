@@ -109,11 +109,6 @@ nav[aria-label="Main navigation"] { display: grid; gap: 4px; margin-top: 8px; }
 .crumb-current { color: var(--ink); font-weight: 600; }
 .topbar-right { display: flex; align-items: center; gap: 16px; }
 .clock { display: inline-flex; align-items: center; height: 28px; padding: 0 10px; border: 1px solid var(--rule); border-radius: var(--radius); color: var(--ink-2); font-size: 12px; font-variant-numeric: tabular-nums; }
-.connection { display: inline-flex; align-items: center; gap: 7px; height: 28px; padding: 0 10px; border: 1px solid var(--rule); border-radius: var(--radius); color: var(--ink-3); font: 500 12px var(--mono); letter-spacing: .04em; text-transform: uppercase; transition: color var(--base) var(--ease), border-color var(--base) var(--ease), background-color var(--base) var(--ease); }
-.live-dot { position: relative; width: 7px; height: 7px; background: var(--rule-strong); }
-.connection.live { border-color: #B7CDB9; background: var(--ok-wash); color: var(--ok); }
-.connection.live .live-dot { background: var(--ok); }
-.connection.live .live-dot::after { content: ""; position: absolute; inset: 0; background: var(--ok); animation: ping 2s var(--ease) infinite; }
 .demo-notice { margin: 4px 0 0; padding: 10px 14px; border: 1px solid var(--rule-strong); border-left: 3px solid var(--accent); border-radius: var(--radius); background: var(--surface); color: var(--ink-2); font-size: 13px; }
 .demo-notice strong { color: var(--ink); }
 

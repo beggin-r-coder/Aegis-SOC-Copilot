@@ -665,15 +665,12 @@ function openSubmit() {
   $("alertDialog").showModal();
 }
 function connect() {
-  if (!("EventSource" in window)) { $("connectionText").textContent = "Live updates unsupported"; return; }
+  if (!("EventSource" in window)) { toast("This browser does not support live updates. Refresh to see new incidents.", true); return; }
   const stream = new EventSource("/api/stream");
   stream.onopen = () => {
-    $("connection").classList.add("live");
-    $("connectionText").textContent = "Live";
     refreshIncidents().catch((error) => toast(error.message, true));
     scheduleStatus();
   };
-  stream.onerror = () => { $("connection").classList.remove("live"); $("connectionText").textContent = "Reconnecting"; };
   stream.addEventListener("incident", (event) => {
     try { upsertIncident(JSON.parse(event.data)); } catch { toast("A live update could not be read. Reconnecting will refresh the feed.", true); }
   });
